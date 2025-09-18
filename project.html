@@ -1,0 +1,51 @@
+<!--project.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bubbl Project Overview</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Project: bubbl</h1>
+
+  <section>
+    <h2>Description</h2>
+    <p>bubbl is a mobile web application that helps people form new friend groups by matching them with local events based on mutual interest. Rather than swiping on individuals, users swipe on nearby events—sourced from external APIs like Google Maps or Eventbrite—and are matched into spontaneous social groups ("bubbles") with others who swiped right on the same event. Once matched, participants are given a day or two to chat, plan, and then meet up in person to participate in the event.</p>
+  </section>
+
+  <section>
+    <h2>Usefulness</h2>
+    <p>Many people want to meet new friends but find it difficult to do so organically. While dating apps like Tinder and Bumble BFF exist, and event apps like Meetup or Facebook Events help people discover activities, few platforms actively match users into small groups around mutual interest in local events. bubbl fills this gap by combining interest-based event discovery with social matching. Unlike Meetup, which requires long-term commitment or heavy planning, bubbl encourages spontaneity and lightweight social engagement.</p>
+  </section>
+
+  <section>
+    <h2>Realness</h2>
+    <p>We use real-world event data pulled from the Google Places API or Eventbrite, filtered by location and activity type. A sample of JSON-formatted event data has already been collected for the South Bend area, including event titles, categories, descriptions, locations, and timestamps. This will form the basis for our prototype and testing.</p>
+  </section>
+
+  <section>
+    <h2>Functionality</h2>
+    <h3>Basic Functions</h3>
+    <ul>
+      <li>User account creation and login</li>
+      <li>Event browsing with swipe left/right interface</li>
+      <li>Formation of match groups based on mutual right swipes</li>
+      <li>In-app messaging within groups</li>
+      <li>Viewing upcoming matched events</li>
+    </ul>
+
+    <h3>Advanced Functions</h3>
+    <ul>
+      <li><strong>Dynamic Group Formation:</strong> Real-time matchmaking system that forms temporary chat groups around events as soon as a threshold of right swipes is reached. Includes expiration logic to disband inactive groups.</li>
+      <li><strong>Interest & Personality Tag Matching:</strong> Users can optionally add interests and personality tags, which are used to prioritize group formation to ensure compatibility beyond event preference. This will require implementing tag-based similarity scoring and weighted matchmaking algorithms.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Why It's Cool</h2>
+    <p>bubbl makes it easy to try something new with new people. It eliminates the pressure of 1:1 meetups or ongoing commitments, and encourages users to step outside their comfort zones. The ephemeral nature of the groups keeps things low-stakes while still encouraging real-world interaction. Features like interest-based matching and real-time group thresholds add a layer of technical depth and user personalization not commonly found in event discovery apps.</p>
+  </section>
+</body>
+</html>
