@@ -16,6 +16,13 @@
   </section>
 
   <section>
+    <h2>Project Summary</h2>
+    <p>Our project is designed to foster community by helping people form new friend groups while exploring activities they may not usually try on their own. Many individuals want to meet new people but often lack a natural setting to do so. Our app addresses this by providing a platform where shared interests in activities serve as the foundation for connection.</p>
+    <p>The app takes inspiration from Tinder’s swipe-based design but shifts the focus away from romantic matches to local activities. Instead of swiping on people, users swipe through a curated list of nearby events and experiences sourced from Google Maps. When a user swipes right on an activity, they are placed into a group of others who also expressed interest in that same activity.Once matched, the group will have one to two days to connect through in-app messaging, allowing time for introductions and planning. After this initial window, the app will provide a scheduled date and time for the activity, ensuring that the experience actually takes place rather than remaining just an idea.</p>
+    <p>The project combines user data with location-based data to create opportunities that are both relevant and accessible. Beyond making new friends, the app encourages people to broaden their horizons by trying different activities, whether it’s a new restaurant, a hiking trail, a cooking class, or a trivia night. In doing so, it not only helps users grow their social circles but also strengthens community engagement and participation.</p>
+  </section>
+
+  <section>
     <h2>Usefulness</h2>
     <p>Many people want to meet new friends but find it difficult to do so organically. While dating apps like Tinder and Bumble BFF exist, and event apps like Meetup or Facebook Events help people discover activities, few platforms actively match users into small groups around mutual interest in local events. bubbl fills this gap by combining interest-based event discovery with social matching. Unlike Meetup, which requires long-term commitment or heavy planning, bubbl encourages spontaneity and lightweight social engagement.</p>
   </section>
@@ -34,18 +41,30 @@
       <li>Formation of match groups based on mutual right swipes</li>
       <li>In-app messaging within groups</li>
       <li>Viewing upcoming matched events</li>
+      <li>Insert/update/delete records to the database (e.g., users, events, messages)</li>
+      <li>Search and list results from the database, including interesting queries</li>
+      <li>At least one complex query that performs a join (e.g., joining user profiles with event participation data)</li>
     </ul>
 
     <h3>Advanced Functions</h3>
     <ul>
-      <li><strong>Dynamic Group Formation:</strong> Real-time matchmaking system that forms temporary chat groups around events as soon as a threshold of right swipes is reached. Includes expiration logic to disband inactive groups.</li>
-      <li><strong>Interest & Personality Tag Matching:</strong> Users can optionally add interests and personality tags, which are used to prioritize group formation to ensure compatibility beyond event preference. This will require implementing tag-based similarity scoring and weighted matchmaking algorithms.</li>
+      <li><strong>Dynamic Group Formation:</strong> Real-time matchmaking system that forms temporary chat groups around events as soon as a threshold of right swipes is reached. Includes expiration logic to disband inactive groups. This will involve a custom server-side implementation of a queue/matching algorithm, using session data and event metadata.</li>
+      <li><strong>Interest & Personality Tag Matching:</strong> Users can optionally add interests and personality tags, which are used to prioritize group formation to ensure compatibility beyond event preference. This requires tag-based similarity scoring, weighted matchmaking algorithms, and scalable data storage for tags.</li>
     </ul>
   </section>
 
   <section>
     <h2>Why It's Cool</h2>
     <p>bubbl makes it easy to try something new with new people. It eliminates the pressure of 1:1 meetups or ongoing commitments, and encourages users to step outside their comfort zones. The ephemeral nature of the groups keeps things low-stakes while still encouraging real-world interaction. Features like interest-based matching and real-time group thresholds add a layer of technical depth and user personalization not commonly found in event discovery apps.</p>
+  </section>
+
+  <section>
+    <h2>Contributors</h2>
+    <ul>
+      <li>Kathryn Cruz &lt;kcruz3@nd.edu&gt;</li>
+      <li>Manuela Roca Zapata &lt;mrocazap@nd.edu&gt;</li>
+      <li>Mariam Jafri &lt;mjafri@nd.edu&gt;</li>
+    </ul>
   </section>
 </body>
 </html>
