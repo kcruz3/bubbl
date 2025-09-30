@@ -1,37 +1,78 @@
+/* General page style */
 body {
   font-family: Arial, sans-serif;
   background-color: #f2f2f2;
   margin: 0;
   padding: 0;
-  text-align: center;
   color: #333;
 }
 
+/* Header */
 header {
   background-color: #00bcd4;
   color: white;
+  text-align: center;
   padding: 20px 0;
 }
 
+header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+header p {
+  margin: 5px 0 0;
+  font-size: 1.1em;
+}
+
+/* Main content container */
 main {
   padding: 40px 20px;
   max-width: 1000px;
   margin: 0 auto;
-  text-align: left;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h1, h2 {
+/* Section headings */
+h2 {
   color: #004080;
-  text-align: center;
+  border-bottom: 2px solid #00bcd4;
+  padding-bottom: 6px;
+  margin-top: 30px;
 }
 
+/* Contributors */
+.contributors {
+  background: #e0f7fa;
+  padding: 15px;
+  border-left: 5px solid #00bcd4;
+  margin-bottom: 20px;
+}
+
+/* Schema text block */
+pre {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  overflow-x: auto;
+  font-family: "Courier New", monospace;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+/* Lists */
+ul {
+  margin: 10px 0 20px 25px;
+}
+
+/* Tables */
 table {
   margin: 20px auto;
   border-collapse: collapse;
-  width: 90%;
+  width: 95%;
   background: #fafafa;
   box-shadow: 0 0 6px rgba(0,0,0,0.05);
 }
@@ -44,16 +85,18 @@ table, th, td {
 th {
   background-color: #00bcd4;
   color: white;
+  text-align: left;
 }
 
 td {
   text-align: left;
 }
 
+/* Links */
 a {
   display: inline-block;
-  margin-top: 20px;
-  padding: 10px 20px;
+  margin-top: 10px;
+  padding: 8px 16px;
   background-color: #00bcd4;
   color: white;
   text-decoration: none;
@@ -65,6 +108,7 @@ a:hover {
   background-color: #0097a7;
 }
 
+/* Images (ERD diagram) */
 img {
   display: block;
   margin: 30px auto;
@@ -72,4 +116,14 @@ img {
   border: 2px solid #ccc;
   border-radius: 6px;
   background: white;
+  padding: 6px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 30px;
 }

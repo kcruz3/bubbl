@@ -89,11 +89,16 @@ Registration
       <p>We collect events dynamically using the <strong>SerpAPI Google Events API</strong>. Our Python script:</p>
       <ul>
         <li>Queries SerpAPI for “Events near South Bend.”</li>
-        <li>Paginates results up to 5,000 events.</li>
+        <li>Paginates results (currently ~500 unique events collected).</li>
         <li>Deduplicates events by <code>(link, start_date)</code>.</li>
         <li>Saves all unique events into <code>southbend_events.json</code>.</li>
       </ul>
-      <p>This ensures Bubbl is powered by real local event data rather than fabricated examples. Additional mock user and registration data will be generated for testing purposes.</p>
+      <p><strong>Scaling Strategy:</strong> To meet the Stage 3 requirement of 10,000+ records across 5+ relations, we will:</p>
+      <ul>
+        <li>Expand queries to multiple cities (Chicago, Indianapolis, Detroit, etc.).</li>
+        <li>Generate additional synthetic test data using Python’s Faker library for users, registrations, and venues.</li>
+        <li>Supplement event data with secondary APIs (Eventbrite, Ticketmaster) if necessary.</li>
+      </ul>
     </section>
 
     <section>
@@ -110,12 +115,12 @@ Registration
       <h2>5. Project Timeline</h2>
       <table>
         <tr><th>Date</th><th>Milestone</th></tr>
-        <tr><td>Sep 25 – Oct 1</td><td>Finalize schema, test SerpAPI pipeline, complete devplan.html.</td></tr>
-        <tr><td>Oct 2 – Oct 10</td><td>Create MySQL tables, build Python loader for southbend_events.json.</td></tr>
-        <tr><td>Oct 11 – Oct 20</td><td>Develop user interface: event listing, search/filter, user login.</td></tr>
-        <tr><td>Oct 21 – Oct 28</td><td>Implement registration and matching features; integrate ticket sources.</td></tr>
-        <tr><td>Oct 29 – Nov 5</td><td>Finalize advanced functions (recommendations, Google Maps), test end-to-end.</td></tr>
-        <tr><td>Nov 6</td><td>Deliver live demo.</td></tr>
+        <tr><td>Sep 25 – Oct 1</td><td>Finalize schema, test SerpAPI pipeline with ~500 events, complete devplan.html.</td></tr>
+        <tr><td>Oct 2 – Oct 10</td><td>Create MySQL tables, build Python loader for southbend_events.json, expand queries to other cities.</td></tr>
+        <tr><td>Oct 11 – Oct 20</td><td>Develop UI for event listing/search; load at least 5,000 records into MySQL.</td></tr>
+        <tr><td>Oct 21 – Oct 28</td><td>Implement registration, user login, ticket features; scale database to &gt;10,000 records.</td></tr>
+        <tr><td>Oct 29 – Nov 2</td><td>Integrate advanced functions (recommendations, Google Maps), end-to-end testing.</td></tr>
+        <tr><td>Nov 2</td><td>Initial Demo with populated database and core functionalities.</td></tr>
       </table>
     </section>
 
@@ -134,7 +139,7 @@ Registration
       <p>
         We provided feedback on the project directly beneath ours in the discussion forum.<br>
         Our comment:  
-        <em>"TO DO!!"</em>
+        <em>“TO DO!!”</em>
       </p>
     </section>
   </main>
