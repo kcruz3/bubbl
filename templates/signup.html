@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sign up • bubbl</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="brand">
+  <img src="{{ url_for('static', filename='images/logo.png') }}" alt="bubbl logo">
+</div>
+
+<main class="shell">
+
+  <section class="hero" aria-hidden="true">
+    <div class="stack">
+      <div class="card"></div>
+      <div class="bubble b1"></div>
+      <div class="bubble b2"></div>
+      <div class="bubble b3"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="card-panel">
+      <h1>Create your account</h1>
+      <p class="sub">It takes less than a minute.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alerts">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+
+      <form method="POST" action="/signup">
+        <div class="grid">
+
+          <div class="full">
+            <label for="username">Username</label>
+            <input id="username" name="username" required>
+          </div>
+
+          <div class="full">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required>
+          </div>
+
+          <div class="full">
+            <label for="name">Full Name</label>
+            <input id="name" name="name" required>
+          </div>
+
+          <div class="full">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" required>
+          </div>
+
+          <div>
+            <label for="user_city">City</label>
+            <input id="user_city" name="user_city" required>
+          </div>
+
+          <div>
+            <label for="user_state">State</label>
+            <input id="user_state" name="user_state" maxlength="2" required>
+          </div>
+
+          <div>
+            <label for="user_age">Age</label>
+            <input id="user_age" type="number" name="user_age" min="18" max="100" required>
+          </div>
+
+          <div>
+            <label for="user_gender">Gender</label>
+            <select id="user_gender" name="user_gender" required>
+              <option value="" disabled selected>Select…</option>
+              <option value="F">Female</option>
+              <option value="M">Male</option>
+              <option value="O">Other / Non-binary</option>
+              <option value="N">Prefer not to say</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button type="submit">Sign up</button>
+      </form>
+
+    </div>
+
+    <p class="foot">
+      Already have an account?
+      <a href="/login">Log in</a>
+    </p>
+  </section>
+</main>
+
+</body>
+</html>

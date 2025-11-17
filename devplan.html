@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bubbl Development Plan</title>
+  <link rel="stylesheet" href="devplan.css">
+</head>
+<body>
+
+  <header>
+    <h1>Bubbl: Development Plan</h1>
+  </header>
+
+  <main>
+    <section class="contributors">
+      <h2>Contributors</h2>
+      <p>
+        Kathryn Cruz &lt;kcruz3@nd.edu&gt;<br>
+        Manuela Roca Zapata &lt;mrocazap@nd.edu&gt;<br>
+        Mariam Jafri &lt;mjafri@nd.edu&gt;
+      </p>
+    </section>
+
+    <section>
+      <h2>1. Relational Schema</h2>
+      <p>Our schema models events, venues, tickets, users, and registrations. Keys and data types are defined below, and we include a visual ER diagram for clarity.</p>
+
+      <pre>
+Venue
+  venue_address VARCHAR(100) PK
+  venue_location VARCHAR(100) PK
+
+Single_Events
+  event_id INT PK
+  event_name VARCHAR(100)
+  event_description TEXT
+  venue_address VARCHAR(100)
+  venue_location VARCHAR(100)
+  link TEXT
+
+Users
+  username VARCHAR(50) PK
+  email VARCHAR(100)
+  full_name VARCHAR(50)
+  user_password VARCHAR(50)
+  user_city VARCHAR(100)
+  user_state CHAR(2)
+
+Matches
+  match_id INT PK
+  event_id INT 
+  username VARCHAR(50)
+  group_id INT 
+
+Match_Groups
+  group_id INT PK
+  group_name VARCHAR(100)
+  event_id INT 
+
+Messages
+  message_id INT PK
+  sender VARCHAR(50)
+  message_content VARCHAR(300) 
+  time_stamp TIMESTAMP
+  group_id INT 
+
+      </pre>
+
+      <p><strong>Functional Dependencies:</strong></p>
+      <ul>
+        <li>event_id → event_name, event_description, venue_address, venue_location, link</li>
+        <li>ticket_id → event_id, provider, ticket_link</li>
+        <li>username → full_name, email, user_password, user_city, user_state</li>
+        <li>match_idi → username, event_id, group_id</li>
+		<li>group_id → group_name, event_id</li>
+		<li>message_id → ender, message_content, time_stamp, group_id</li>
+      </ul>
+
+      <img src="Relational_Schema_2.jpeg" alt="Database Relational Schema Diagram">
+    </section>
+
+    <section>
+      <h2>2. Databases and Platforms</h2>
+      <p>
+        We will use <strong>MySQL</strong> on <code>db8.cse.nd.edu</code> as our primary relational database.<br>
+        Our backend will be built in <strong>Python (Flask)</strong> to provide REST endpoints and handle database operations.<br>
+        The frontend will use <strong>HTML, CSS, JavaScript, and Bootstrap</strong> for responsive, user-friendly design.
+      </p>
+    </section>
+
+    <section>
+      <h2>3. Data Sources</h2>
+      <p>We collect events dynamically using the <strong>SerpAPI Google Events API</strong>. Our Python script:</p>
+      <ul>
+        <li>Queries SerpAPI for “Events near South Bend.”</li>
+        <li>Paginates results (currently ~500 unique events collected).</li>
+        <li>Deduplicates events by <code>(link, start_date)</code>.</li>
+        <li>Saves all unique events into <code>southbend_events.json</code>.</li>
+      </ul>
+      <p><strong>Scaling Strategy:</strong> To meet the Stage 3 requirement of 10,000+ records across 5+ relations, we will:</p>
+      <ul>
+        <li>Expand queries to multiple cities (Chicago, Indianapolis, Detroit, etc.).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. Labor Division</h2>
+      <table>
+        <tr><th>Member</th><th>Role</th><th>Responsibilities</th></tr>
+        <tr><td>Kathryn Cruz</td><td>Backend Developer</td><td>Schema design, SerpAPI Integration, JSON → MySQL loader scripts.</td></tr>
+        <tr><td>Manuela Roca Zapata</td><td>Frontend Developer</td><td>Data cleaning, Flask backend, SQL queries, UI/UX design, HTML/CSS/JS. </td></tr>
+        <tr><td>Mariam Jafri</td><td>Backend</td><td>Flask backend, HTML, testing, documentation.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>5. Project Timeline</h2>
+      <table>
+        <tr><th>Date</th><th>Milestone</th></tr>
+        <tr><td>Sep 25 – Oct 1</td><td>Finalize schema, test SerpAPI pipeline with ~500 events, complete devplan.html.</td></tr>
+        <tr><td>Oct 2 – Oct 10</td><td>Create MySQL tables, build Python loader for southbend_events.json, expand queries to other cities.</td></tr>
+        <tr><td>Oct 11 – Oct 20</td><td>Develop UI for event listing/search; load at least 5,000 queries</td></tr>
+        <tr><td>Oct 21 – Oct 28</td><td>Implement registration, user login, group matching (Stage 3 progress) </td></tr>
+        <tr><td>Oct 29 – Nov 2</td><td>Integrate advanced functions (recommendations, Google Maps), end-to-end testing.</td></tr>
+        <tr><td>Nov 2</td><td>Initial Demo with populated database and core functionalities.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>6. Project Demo URL</h2>
+      <p>
+        Our demo will be hosted at:  
+        <a href="http://db8.cse.nd.edu:5024" target="_blank">
+       		http://db8.cse.nd.edu:5024   
+        </a>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Bubbl Project Team</p>
+  </footer>
+
+</body>
+</html>

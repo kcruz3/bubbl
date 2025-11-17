@@ -1,0 +1,76 @@
+<!--project.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bubbl Project Overview</title>
+  <link rel="stylesheet" href="project.css">
+</head>
+<body>
+  <h1>Project: bubbl</h1>
+
+  <section>
+    <h2>Description</h2>
+    <p>bubbl is a mobile web application that helps people form new friend groups by matching them with local events based on mutual interest. Rather than swiping on individuals, users swipe on nearby events—sourced from external APIs and are matched into spontaneous social groups ("bubbles") with others who swiped right on the same event. Once matched, participants can chat and plan, and then meet up in person to participate in the event.</p>
+  </section>
+
+  <section>
+    <h2>Project Summary</h2>
+    <p>Our project is designed to foster community by helping people form new friend groups while exploring activities they may not usually try on their own. Many individuals want to meet new people but often lack a natural setting to do so. Our app addresses this by providing a platform where shared interests in activities serve as the foundation for connection. At the core it's taking connections off the screen</p>
+    <p>The app takes inspiration from Tinder’s swipe-based design but shifts the focus away from romantic matches to local activities. Instead of swiping on people, users swipe through a curated list of nearby events and experiences. When a user swipes right on an activity, they are placed into a group of others who also expressed interest in that same activity. Once matched, the group can connect through in-app messaging, allowing time for introductions and planning.</p>
+    <p>The project combines user data with location-based data to create opportunities that are both relevant and accessible. Beyond making new friends, the app encourages people to broaden their horizons by trying different activities, whether it’s a new restaurant, a hiking trail, a cooking class, or a trivia night. In doing so, it not only helps users grow their social circles but also strengthens community engagement and participation.</p>
+  </section>
+
+  <section>
+    <h2>Usefulness</h2>
+    <p>Many people want to meet new friends but find it difficult to do so organically. While dating apps like Tinder and Bumble BFF exist, and event apps like Meetup or Facebook Events help people discover activities, few platforms actively match users into small groups around mutual interest in local events. bubbl fills this gap by combining interest-based event discovery with social matching. Unlike Meetup, which requires long-term commitment or heavy planning, bubbl encourages spontaneity and lightweight social engagement. </p>
+  </section>
+
+  <section>
+    <h2>Realness</h2>
+    <p>We use real-world event data pulled from SerpAPI filtered by location and activity type. A sample of JSON-formatted event data has already been collected for the South Bend area, including event titles, categories, descriptions, locations, and timestamps. This will form the basis for our prototype and testing.</p>
+  </section>
+
+  <section>
+    <h2>Functionality</h2>
+    <h3>Basic Functions</h3>
+    <ul>
+      <li>User account creation and login</li>
+      <li>Event browsing with swipe left/right interface</li>
+      <li>Formation of match groups based on mutual right swipes</li>
+      <li>In-app messaging within groups</li>
+      <li>Progile page with viewing matched groups</li>
+    </ul>
+
+    <h3>Advanced Function Options</h3>
+    <ul>
+      <li><strong>Group Formation:</strong> Currently, we are creating groups based on shared interests after a certain threshold of users join. As an advanced function we could dynamically create it so users can leave a group and if so, groups could rebalance or a dynamic threshold can be created based on the number of users and the popularity of the event.</li>
+      <li><strong>Swiping Feature:</strong> Users will be able to glance at events one at a time and then swipe left or right if they like the event or not, this information (what they swipe no on) will influence the queue. This queue formation will be our advanved function as it will allow the user to interact with the data in a more personalized way.</li>
+	 <li><strong> Calendar Integration</strong> Allowing users in the group to schedule the event in their groupchat. This will also allow us to keep track of which groups seemed to be successful in creating a group to go to an event, allowing us to create interesting analytics to better help our app. </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Why It's Cool</h2>
+    <p>bubbl makes it easy to try something new with new people. It eliminates the pressure of 1:1 meetups or ongoing commitments, and encourages users to step outside their comfort zones. The ephemeral nature of the groups keeps things low-stakes while still encouraging real-world interaction. Features like interest-based matching and real-time group thresholds add a layer of technical depth and user personalization not commonly found in event discovery apps.</p>
+  </section>
+
+
+  <section>
+    <h2>Entity-Relationship Diagram</h2>
+    <p>Our data model is summarized in the following ER diagram:</p>
+	
+      <img src="Relational_Schema_2.jpeg" alt="Database Relational Schema Diagram" style="max-width: 100%; height: auto;">
+  </section>
+
+  <section>
+    <h2>Contributors</h2>
+    <ul>
+      <li>Kathryn Cruz &lt;kcruz3@nd.edu&gt;</li>
+      <li>Manuela Roca Zapata &lt;mrocazap@nd.edu&gt;</li>
+      <li>Mariam Jafri &lt;mjafri@nd.edu&gt;</li>
+    </ul>
+  </section>
+</body>
+</html>
