@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>My Groups</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin:0; padding:16px; }
+    h2 { margin-bottom: 12px; }
+    ul { list-style:none; padding:0; }
+    li { margin:8px 0; }
+    a { text-decoration:none; color:#1e88e5; }
+    a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <h2>My Groups</h2>
+  {% if groups %}
+    <ul>
+      {% for g in groups %}
+        <li>
+          <a href="/group/{{ g.group_id }}">
+            Group {{ g.group_id }} ({{ g.group_name }}) — Event: {{ g.event_name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You are not in any groups yet.</p>
+  {% endif %}
+
+  <p><a href="/events">← Back to Events</a></p>
+</body>
+</html>

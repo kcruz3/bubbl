@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bubbl – Events</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f6f4ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        #card-container {
+            position: relative;
+            width: 320px;
+            max-width: 90vw;
+            height: 420px;
+            margin-top: 1rem;
+        }
+
+        .event-card {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .event-card.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .event-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .event-meta {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-desc {
+            flex: 1;
+            font-size: 0.95rem;
+            margin: 0.75rem 0 1rem;
+        }
+
+        .event-link a {
+            font-size: 0.9rem;
+            text-decoration: none;
+            color: #7c3aed;
+        }
+
+        .swipe-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.6rem 0.8rem;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .btn-no {
+            background: #eee;
+        }
+
+        .btn-yes {
+            background: #a855f7;
+            color: white;
+        }
+
+        #no-events {
+            margin-top: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Events near you</h1>
+    <p>Swipe right if you’re interested, left to skip.</p>
+
+    <div id="card-container">
+        <!-- Card is filled by JS -->
+        <div id="event-card" class="event-card hidden">
+            <div>
+                <div class="event-title" id="event-title"></div>
+                <div class="event-meta" id="event-location"></div>
+                <div class="event-meta" id="event-address"></div>
+            </div>
+            <div class="event-desc" id="event-description"></div>
+            <div class="event-link" id="event-link"></div>
+            <div class="swipe-buttons">
+                <button id="btn-no" class="btn btn-no">Nope</button>
+                <button id="btn-yes" class="btn btn-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="no-events" style="display:none;">
+        No more events in your area. 🎉
+    </div>
+
+    <!-- Flask dumps the events as raw JSON here -->
+    <script id="events-data" type="application/json">
+        {{ events|tojson|safe }}
+    </script>
+
+    <script>
+        // Read JSON safely from the script tag
+        let swipeEvents = [];
+        (function loadEvents() {
+            const dataEl = document.getElementById("events-data");
+            if (!dataEl) return;
+            const raw = dataEl.textContent || dataEl.innerText || "[]";
+            try {
+                swipeEvents = JSON.parse(raw);
+            } catch (e) {
+                console.error("Failed to parse events JSON:", e, raw);
+                swipeEvents = [];
+            }
+        })();
+
+        let currentIndex = 0;
+
+        const card       = document.getElementById("event-card");
+        const titleEl    = document.getElementById("event-title");
+        const locEl      = document.getElementById("event-location");
+        const addrEl     = document.getElementById("event-address");
+        const descEl     = document.getElementById("event-description");
+        const linkEl     = document.getElementById("event-link");
+        const noEventsEl = document.getElementById("no-events");
+        const btnNo      = document.getElementById("btn-no");
+        const btnYes     = document.getElementById("btn-yes");
+
+        function renderEvent() {
+            if (!Array.isArray(swipeEvents) || swipeEvents.length === 0 || currentIndex >= swipeEvents.length) {
+                card.classList.add("hidden");
+                noEventsEl.style.display = "block";
+                return;
+            }
+
+            const ev = swipeEvents[currentIndex];
+
+            titleEl.textContent = ev.event_name || "Untitled Event";
+            locEl.textContent   = ev.venue_location || "";
+            addrEl.textContent  = ev.venue_address || "";
+            descEl.textContent  = ev.event_description || "";
+
+            if (ev.link) {
+                linkEl.innerHTML = `<a href="${ev.link}" target="_blank" rel="noopener noreferrer">
+                    More details
+                </a>`;
+            } else {
+                linkEl.innerHTML = "";
+            }
+
+            card.style.transform = "translateX(0px)";
+            card.style.opacity = 1;
+            card.classList.remove("hidden");
+        }
+
+        async function sendSwipe(ev, choice) {
+            try {
+                await fetch(`/api/events/${ev.event_id}/swipe`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ choice })
+                });
+            } catch (err) {
+                console.error("Error sending swipe:", err);
+            }
+        }
+
+        function swipe(direction) {
+            if (!Array.isArray(swipeEvents) || currentIndex >= swipeEvents.length) return;
+            const ev = swipeEvents[currentIndex];
+
+            const offset = direction === "right" ? 300 : -300;
+            card.style.transform = `translateX(${offset}px)`;
+            card.style.opacity = 0;
+
+            if (direction === "right") {
+                // YES swipe → bump popularity
+                sendSwipe(ev, "yes");
+
+                // OPTIONAL: also sign them up for the event:
+                // window.location.href = `/select_event/${ev.event_id}`;
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                renderEvent();
+            }, 200);
+        }
+
+        // Buttons
+        btnNo.addEventListener("click", () => swipe("left"));
+        btnYes.addEventListener("click", () => swipe("right"));
+
+        // Touch swipe handling
+        let startX = null;
+
+        card.addEventListener("touchstart", (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        card.addEventListener("touchend", (e) => {
+            if (startX === null) return;
+            const endX = e.changedTouches[0].clientX;
+            const deltaX = endX - startX;
+
+            if (Math.abs(deltaX) > 50) {
+                if (deltaX > 0) {
+                    swipe("right");
+                } else {
+                    swipe("left");
+                }
+            }
+            startX = null;
+        });
+
+        // Initial render
+        if (!Array.isArray(swipeEvents) || swipeEvents.length === 0) {
+            card.classList.add("hidden");
+            noEventsEl.style.display = "block";
+        } else {
+            renderEvent();
+        }
+    </script>
+</body>
+</html>

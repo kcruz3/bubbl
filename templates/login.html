@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Login • bubbl</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- fixed top-right brand -->
+  <div class="brand" aria-label="bubbl brand">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="bubbl logo">
+    <span>bubbl</span>
+  </div>
+
+  <main class="shell">
+    <!-- left: playful visual -->
+    <section class="hero" aria-hidden="true">
+      <div class="stack">
+        <div class="card"></div>
+        <div class="bubble b1"></div>
+        <div class="bubble b2"></div>
+        <div class="bubble b3"></div>
+      </div>
+    </section>
+
+    <!-- right: login card (functionality unchanged) -->
+    <section class="panel">
+      <div class="card-panel">
+        <h1>Log in</h1>
+        <p class="sub">Match activities. Meet your group.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alerts">
+              {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login" autocomplete="on">
+          <label for="username">Username:</label>
+          <input id="username" name="username" type="text" required autofocus>
+
+          <label for="password">Password:</label>
+          <input id="password" name="password" type="password" required>
+
+          <button type="submit">Log in</button>
+
+        </form>
+
+      </div>
+
+      <p class="foot" style="margin-top:14px;">
+        Don’t have an account?
+        <a href="/signup">Sign up</a>
+      </p>
+    </section>
+  </main>
+</body>
+</html>
+
+
