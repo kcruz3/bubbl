@@ -172,6 +172,14 @@ def swipe_event(event_id):
         "already_waiting": False,
     }
 
+    rating_value = 1 if choice == "yes" else 0
+    cursor.execute("""
+        INSERT INTO User_Event_Ratings (username, event_id, rating)
+        VALUES (%s, %s, %s)
+        ON DUPLICATE KEY UPDATE rating = VALUES(rating)
+    """, (username, event_id, rating_value))
+    db.commit()
+
     if choice == "yes":
         # 0) bump popularity for this event
         cursor.execute(
@@ -426,6 +434,156 @@ def my_groups():
 
     return render_template("my_group.html", groups=groups)
 
+@app.route("/api/hybrid_recommendations")
+def hybrid_recommendations():
+    if "username" not in session:
+        return jsonify({"error": "unauthorized"}), 401
+
+    username = session["username"]
+    cursor = db.cursor(DictCursor)
+
+    # ----------------------------------------
+    # 1) Get the user's interests
+    # ----------------------------------------
+    cursor.execute("""
+        SELECT interest_id 
+        FROM User_Interests
+        WHERE username = %s
+    """, (username,))
+    user_interests = [row["interest_id"] for row in cursor.fetchall()]
+
+    # If user has no interests → fallback to random
+    if not user_interests:
+        cursor.execute("""
+            SELECT *
+            FROM Single_Events
+            ORDER BY RAND()
+            LIMIT 20
+        """)
+        return jsonify(cursor.fetchall())
+
+    # ----------------------------------------
+    # 2) Find similar users by shared interests
+    # ----------------------------------------
+    cursor.execute("""
+        SELECT ui2.username, COUNT(*) AS shared
+        FROM User_Interests ui1
+        JOIN User_Interests ui2
+             ON ui1.interest_id = ui2.interest_id
+        WHERE ui1.username = %s
+          AND ui2.username <> %s
+        GROUP BY ui2.username
+        ORDER BY shared DESC
+        LIMIT 10
+    """, (username, username))
+
+    similar_users = [row["username"] for row in cursor.fetchall()]
+
+    # ----------------------------------------
+    # 3) Events liked by similar users
+    # rating = 1 means they swiped "Yes"
+    # ----------------------------------------
+    liked_events = []
+    if similar_users:
+        format_strings = ",".join(["%s"] * len(similar_users))
+        cursor.execute(f"""
+            SELECT DISTINCT event_id
+            FROM User_Event_Ratings
+            WHERE username IN ({format_strings})
+              AND rating = 1
+        """, similar_users)
+        liked_events = [row["event_id"] for row in cursor.fetchall()]
+
+    # ----------------------------------------
+    # 4) Content-based: events matching user interests
+    # (You need to eventually add an Event_Interests table)
+    # For now: treat event_description + event_name as text match
+    # ----------------------------------------
+    if user_interests:
+        # Fake content-based: using keyword search from Interests table
+        cursor.execute("""
+            SELECT interest_name
+            FROM Interests
+            WHERE interest_id IN (
+                SELECT interest_id FROM User_Interests WHERE username = %s
+            )
+        """, (username,))
+        keywords = [row["interest_name"] for row in cursor.fetchall()]
+    else:
+        keywords = []
+
+    content_events = set()
+
+    # simple keyword scan (update later if you add event tags)
+    for kw in keywords:
+        cursor.execute("""
+            SELECT event_id
+            FROM Single_Events
+            WHERE event_name LIKE %s
+               OR event_description LIKE %s
+            LIMIT 20
+        """, (f"%{kw}%", f"%{kw}%"))
+        content_events.update([row["event_id"] for row in cursor.fetchall()])
+
+    # ----------------------------------------
+    # 5) Random exploration pool (ensures discovery)
+    # ----------------------------------------
+    cursor.execute("""
+        SELECT event_id
+        FROM Single_Events
+        ORDER BY RAND()
+        LIMIT 25
+    """)
+    random_pool = [row["event_id"] for row in cursor.fetchall()]
+
+    # ----------------------------------------
+    # 6) Combine events (unique)
+    # ----------------------------------------
+    combined_event_ids = set(liked_events) | set(content_events) | set(random_pool)
+
+    if not combined_event_ids:
+        return jsonify([])
+
+    # ----------------------------------------
+    # 7) Build hybrid score for each event
+    # ----------------------------------------
+    final_scores = {}
+
+    for eid in combined_event_ids:
+        score = 0
+
+        # CF weight
+        if eid in liked_events:
+            score += 3
+
+        # content match
+        if eid in content_events:
+            score += 2
+
+        # slight random boost
+        if eid in random_pool:
+            score += 1
+
+        final_scores[eid] = score
+
+    # sort by score descending
+    sorted_ids = sorted(final_scores.keys(), key=lambda x: final_scores[x], reverse=True)
+
+    # fetch event details
+    format_strings = ",".join(["%s"] * len(sorted_ids))
+    cursor.execute(f"""
+        SELECT *
+        FROM Single_Events
+        WHERE event_id IN ({format_strings})
+    """, sorted_ids)
+
+    events = cursor.fetchall()
+
+    # reorder to match hybrid ranking
+    event_map = {e["event_id"]: e for e in events}
+    sorted_events = [event_map[eid] for eid in sorted_ids]
+
+    return jsonify(sorted_events)
 
 
 if __name__ == '__main__': 

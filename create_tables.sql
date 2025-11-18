@@ -79,3 +79,29 @@ CREATE TABLE Messages (
         ON DELETE CASCADE 
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE Interests (
+    interest_id INT AUTO_INCREMENT PRIMARY KEY,
+    interest_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE User_Interests (
+    username VARCHAR(50) NOT NULL,
+    interest_id INT NOT NULL,
+    PRIMARY KEY (username, interest_id),
+    FOREIGN KEY (username) REFERENCES Users(username)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (interest_id) REFERENCES Interests(interest_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE User_Event_Ratings (
+    username VARCHAR(50) NOT NULL,
+    event_id BIGINT UNSIGNED NOT NULL,
+    rating INT NOT NULL,  -- 1 = yes, 2 = attended
+    PRIMARY KEY (username, event_id),
+    FOREIGN KEY (username) REFERENCES Users(username)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES Single_Events(event_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
