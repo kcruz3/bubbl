@@ -95,13 +95,3 @@ CREATE TABLE User_Interests (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE User_Event_Ratings (
-    username VARCHAR(50) NOT NULL,
-    event_id BIGINT UNSIGNED NOT NULL,
-    rating INT NOT NULL,  -- 1 = yes, 2 = attended
-    PRIMARY KEY (username, event_id),
-    FOREIGN KEY (username) REFERENCES Users(username)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (event_id) REFERENCES Single_Events(event_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-);

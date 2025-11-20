@@ -442,9 +442,7 @@ def hybrid_recommendations():
     username = session["username"]
     cursor = db.cursor(DictCursor)
 
-    # ----------------------------------------
     # 1) Get the user's interests
-    # ----------------------------------------
     cursor.execute("""
         SELECT interest_id 
         FROM User_Interests
@@ -462,9 +460,7 @@ def hybrid_recommendations():
         """)
         return jsonify(cursor.fetchall())
 
-    # ----------------------------------------
     # 2) Find similar users by shared interests
-    # ----------------------------------------
     cursor.execute("""
         SELECT ui2.username, COUNT(*) AS shared
         FROM User_Interests ui1
@@ -479,42 +475,31 @@ def hybrid_recommendations():
 
     similar_users = [row["username"] for row in cursor.fetchall()]
 
-    # ----------------------------------------
-    # 3) Events liked by similar users
-    # rating = 1 means they swiped "Yes"
-    # ----------------------------------------
+    # 3) Events liked (swiped) by similar users  
+    # Matches table = implicit feedback (right swipes only)
     liked_events = []
     if similar_users:
         format_strings = ",".join(["%s"] * len(similar_users))
         cursor.execute(f"""
             SELECT DISTINCT event_id
-            FROM User_Event_Ratings
+            FROM Matches
             WHERE username IN ({format_strings})
-              AND rating = 1
+              AND group_id IS NULL   -- ensures only swipes, not matches
         """, similar_users)
         liked_events = [row["event_id"] for row in cursor.fetchall()]
 
-    # ----------------------------------------
     # 4) Content-based: events matching user interests
-    # (You need to eventually add an Event_Interests table)
-    # For now: treat event_description + event_name as text match
-    # ----------------------------------------
-    if user_interests:
-        # Fake content-based: using keyword search from Interests table
-        cursor.execute("""
-            SELECT interest_name
-            FROM Interests
-            WHERE interest_id IN (
-                SELECT interest_id FROM User_Interests WHERE username = %s
-            )
-        """, (username,))
-        keywords = [row["interest_name"] for row in cursor.fetchall()]
-    else:
-        keywords = []
+    cursor.execute("""
+        SELECT interest_name
+        FROM Interests
+        WHERE interest_id IN (
+            SELECT interest_id FROM User_Interests WHERE username = %s
+        )
+    """, (username,))
+    keywords = [row["interest_name"] for row in cursor.fetchall()]
 
     content_events = set()
 
-    # simple keyword scan (update later if you add event tags)
     for kw in keywords:
         cursor.execute("""
             SELECT event_id
@@ -525,9 +510,7 @@ def hybrid_recommendations():
         """, (f"%{kw}%", f"%{kw}%"))
         content_events.update([row["event_id"] for row in cursor.fetchall()])
 
-    # ----------------------------------------
-    # 5) Random exploration pool (ensures discovery)
-    # ----------------------------------------
+    # 5) Random exploration pool
     cursor.execute("""
         SELECT event_id
         FROM Single_Events
@@ -536,40 +519,25 @@ def hybrid_recommendations():
     """)
     random_pool = [row["event_id"] for row in cursor.fetchall()]
 
-    # ----------------------------------------
-    # 6) Combine events (unique)
-    # ----------------------------------------
+    # 6) Combine events
     combined_event_ids = set(liked_events) | set(content_events) | set(random_pool)
 
     if not combined_event_ids:
         return jsonify([])
 
-    # ----------------------------------------
-    # 7) Build hybrid score for each event
-    # ----------------------------------------
+    # 7) Score events
     final_scores = {}
 
     for eid in combined_event_ids:
         score = 0
-
-        # CF weight
-        if eid in liked_events:
-            score += 3
-
-        # content match
-        if eid in content_events:
-            score += 2
-
-        # slight random boost
-        if eid in random_pool:
-            score += 1
-
+        if eid in liked_events: score += 3
+        if eid in content_events: score += 2
+        if eid in random_pool: score += 1
         final_scores[eid] = score
 
-    # sort by score descending
     sorted_ids = sorted(final_scores.keys(), key=lambda x: final_scores[x], reverse=True)
 
-    # fetch event details
+    # fetch details
     format_strings = ",".join(["%s"] * len(sorted_ids))
     cursor.execute(f"""
         SELECT *
@@ -579,7 +547,7 @@ def hybrid_recommendations():
 
     events = cursor.fetchall()
 
-    # reorder to match hybrid ranking
+    # reorder
     event_map = {e["event_id"]: e for e in events}
     sorted_events = [event_map[eid] for eid in sorted_ids]
 
