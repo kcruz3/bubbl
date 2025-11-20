@@ -442,7 +442,7 @@ def hybrid_recommendations():
     username = session["username"]
     cursor = db.cursor(DictCursor)
 
-    # 1) Get the user's interests
+    # 1) get the user's interests
     cursor.execute("""
         SELECT interest_id 
         FROM User_Interests
@@ -450,7 +450,7 @@ def hybrid_recommendations():
     """, (username,))
     user_interests = [row["interest_id"] for row in cursor.fetchall()]
 
-    # If user has no interests → fallback to random
+    # fallback if user chose no interests
     if not user_interests:
         cursor.execute("""
             SELECT *
@@ -460,12 +460,12 @@ def hybrid_recommendations():
         """)
         return jsonify(cursor.fetchall())
 
-    # 2) Find similar users by shared interests
+    # 2) find similar users based on shared interests
     cursor.execute("""
         SELECT ui2.username, COUNT(*) AS shared
         FROM User_Interests ui1
         JOIN User_Interests ui2
-             ON ui1.interest_id = ui2.interest_id
+            ON ui1.interest_id = ui2.interest_id
         WHERE ui1.username = %s
           AND ui2.username <> %s
         GROUP BY ui2.username
@@ -475,31 +475,30 @@ def hybrid_recommendations():
 
     similar_users = [row["username"] for row in cursor.fetchall()]
 
-    # 3) Events liked (swiped) by similar users  
-    # Matches table = implicit feedback (right swipes only)
+    # 3) events liked (right-swiped) by similar users
     liked_events = []
     if similar_users:
-        format_strings = ",".join(["%s"] * len(similar_users))
+        placeholders = ",".join(["%s"] * len(similar_users))
         cursor.execute(f"""
             SELECT DISTINCT event_id
             FROM Matches
-            WHERE username IN ({format_strings})
-              AND group_id IS NULL   -- ensures only swipes, not matches
+            WHERE username IN ({placeholders})
         """, similar_users)
         liked_events = [row["event_id"] for row in cursor.fetchall()]
 
-    # 4) Content-based: events matching user interests
+    # 4) content-based events using interest keywords
     cursor.execute("""
         SELECT interest_name
         FROM Interests
         WHERE interest_id IN (
-            SELECT interest_id FROM User_Interests WHERE username = %s
+            SELECT interest_id 
+            FROM User_Interests 
+            WHERE username = %s
         )
     """, (username,))
     keywords = [row["interest_name"] for row in cursor.fetchall()]
 
     content_events = set()
-
     for kw in keywords:
         cursor.execute("""
             SELECT event_id
@@ -510,7 +509,7 @@ def hybrid_recommendations():
         """, (f"%{kw}%", f"%{kw}%"))
         content_events.update([row["event_id"] for row in cursor.fetchall()])
 
-    # 5) Random exploration pool
+    # 5) random exploration
     cursor.execute("""
         SELECT event_id
         FROM Single_Events
@@ -519,40 +518,40 @@ def hybrid_recommendations():
     """)
     random_pool = [row["event_id"] for row in cursor.fetchall()]
 
-    # 6) Combine events
-    combined_event_ids = set(liked_events) | set(content_events) | set(random_pool)
-
-    if not combined_event_ids:
+    # 6) merge all sources
+    combined_ids = set(liked_events) | set(content_events) | set(random_pool)
+    if not combined_ids:
         return jsonify([])
 
-    # 7) Score events
+    # 7) scoring
     final_scores = {}
-
-    for eid in combined_event_ids:
+    for eid in combined_ids:
         score = 0
-        if eid in liked_events: score += 3
-        if eid in content_events: score += 2
-        if eid in random_pool: score += 1
+        if eid in liked_events:
+            score += 3
+        if eid in content_events:
+            score += 2
+        if eid in random_pool:
+            score += 1
         final_scores[eid] = score
 
+    # sort by score
     sorted_ids = sorted(final_scores.keys(), key=lambda x: final_scores[x], reverse=True)
 
-    # fetch details
-    format_strings = ",".join(["%s"] * len(sorted_ids))
+    # fetch event details
+    placeholders = ",".join(["%s"] * len(sorted_ids))
     cursor.execute(f"""
         SELECT *
         FROM Single_Events
-        WHERE event_id IN ({format_strings})
+        WHERE event_id IN ({placeholders})
     """, sorted_ids)
-
     events = cursor.fetchall()
 
-    # reorder
+    # maintain sorted order
     event_map = {e["event_id"]: e for e in events}
     sorted_events = [event_map[eid] for eid in sorted_ids]
 
     return jsonify(sorted_events)
-
 
 if __name__ == '__main__': 
     app.debug = True
